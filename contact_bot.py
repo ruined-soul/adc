@@ -24,8 +24,7 @@ async def forward_to_admin(client, message):
         user_chat_ids[message.from_user.id] = message.chat.id
         # Forward the message to the admin
         await message.forward(admin_chat_id)
-        # Optionally, add a confirmation message to the admin
-        await client.send_message(admin_chat_id, "You have a new contact message.")
+        
     except PeerIdInvalid:
         logging.error("Peer ID is invalid or admin has not started a chat.")
         await message.reply_text("Error: The admin has not started a conversation with the bot yet. Please contact the admin to start a conversation with the bot.")
