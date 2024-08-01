@@ -13,15 +13,15 @@ admin_chat_id = '1159381624'
 
 app = Client("contact_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
-# Dictionary to store user IDs and their corresponding chat IDs
-user_chat_ids = {}
+# Dictionary to store user messages and their corresponding chat IDs
+user_messages = {}
 
 @app.on_message(filters.private & ~filters.bot)
 async def forward_to_admin(client, message):
     try:
         logging.info(f"Forwarding message from {message.from_user.id} to admin {admin_chat_id}")
-        # Store the user chat ID for reply purposes
-        user_chat_ids[message.from_user.id] = message.chat.id
+        # Store the user chat ID and message ID for reply purposes
+        user_messages[message.message_id] = (message.from_user.id, message.chat.id)
         # Forward the message to the admin
         await message.forward(admin_chat_id)
         
@@ -32,14 +32,15 @@ async def forward_to_admin(client, message):
 @app.on_message(filters.chat(admin_chat_id) & filters.reply)
 async def reply_to_user(client, message):
     if message.reply_to_message:
-        # Extract the original sender ID from the reply message
-        original_sender_id = message.reply_to_message.forward_from.id
-        user_chat_id = user_chat_ids.get(original_sender_id)
-        if user_chat_id:
+        # Extract the original message ID from the reply
+        original_message_id = message.reply_to_message.message_id
+        user_info = user_messages.get(original_message_id)
+        if user_info:
+            original_sender_id, user_chat_id = user_info
             logging.info(f"Sending reply from admin {admin_chat_id} to user {user_chat_id}")
             await client.send_message(user_chat_id, message.text)
         else:
-            logging.error(f"User chat ID not found for user ID {original_sender_id}")
+            logging.error(f"User chat ID not found for message ID {original_message_id}")
             await client.send_message(admin_chat_id, "Failed to find the user chat ID. Please check.")
 
 @app.on_message(filters.command("start") & filters.private)
