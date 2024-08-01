@@ -6,7 +6,6 @@ from pyrogram.errors import PeerIdInvalid
 logging.basicConfig(level=logging.DEBUG)
 
 # Replace with your own values
-
 api_id = '2170492'
 api_hash = '82b683da442942d5c177ec520318a32f'
 bot_token = '7304879730:AAHWnILVrNQjeD7QuLMd3UOuC5xf72mzd5I'
@@ -42,6 +41,7 @@ async def reply_to_user(client, message):
             await client.send_message(user_chat_id, message.text)
         else:
             logging.error(f"User chat ID not found for user ID {original_sender_id}")
+            await client.send_message(admin_chat_id, "Failed to find the user chat ID. Please check.")
 
 @app.on_message(filters.command("start") & filters.private)
 async def start_command(client, message):
@@ -55,12 +55,3 @@ async def start_command(client, message):
 
 if __name__ == "__main__":
     app.run()
-
-@app.on_message(filters.command("start") & filters.private)
-async def start_command(client, message):
-    welcome_message = (
-        "Hello! I'm your contact bot.\n"
-        "Please send your message, and I will forward it to the admin.\n"
-        "If you have any questions or need support, let me know!"
-    )
-    await message.reply_text(welcome_message)
