@@ -32,7 +32,7 @@ async def forward_to_admin(client, message):
 
 @app.on_message(filters.chat(admin_chat_id) & filters.reply)
 async def reply_to_user(client, message):
-    if message.reply_to_message and message.reply_to_message.forward_from:
+    if message.reply_to_message:
         # Extract the original sender ID from the reply message
         original_sender_id = message.reply_to_message.forward_from.id
         user_chat_id = user_chat_ids.get(original_sender_id)
